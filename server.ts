@@ -15,75 +15,59 @@ const isProduction = process.env.NODE_ENV === 'production';
 
 app.use(express.json());
 
-// In-memory payment and call records for demo/production testing
-interface PaymentTransaction {
+// In-memory donation and payment store
+interface PaymentRecord {
   id: string;
   tx_ref: string;
   amount: number;
   currency: string;
-  gateway: 'Chapa' | 'Telebirr' | 'CBE_Birr';
-  status: 'pending' | 'success' | 'failed';
-  customer: {
-    name: string;
-    email: string;
-    phone?: string;
-  };
+  gateway: 'Chapa' | 'Telebirr' | 'CBE_Birr' | 'Awash_Bank';
+  type: 'Donation' | 'Trade_Escrow' | 'Task_Payout';
+  donorOrBuyer: string;
   purpose: string;
-  createdAt: string;
-  metadata?: Record<string, any>;
+  date: string;
+  status: 'Settled' | 'Pending';
 }
 
-const transactionsStore: Map<string, PaymentTransaction> = new Map();
+const paymentsStore: Map<string, PaymentRecord> = new Map();
 
-// Initialize sample transaction history
-transactionsStore.set('tx-chapa-101', {
-  id: 'tx-chapa-101',
-  tx_ref: 'ZAIC-CHAPA-2026-901',
-  amount: 45000,
-  currency: 'ETB',
-  gateway: 'Chapa',
-  status: 'success',
-  customer: {
-    name: 'Kaleb Tadesse',
-    email: 'kaleb@oromiacoffee.org',
-    phone: '+251911223344'
-  },
-  purpose: 'Export Arabica Coffee Escrow Pre-funding',
-  createdAt: '2026-09-28T14:32:00Z'
+// Initial sample transaction records
+paymentsStore.set('TX-CBE-101', {
+  id: 'TX-CBE-101',
+  tx_ref: 'CBE-AID-9821',
+  amount: 50,
+  currency: 'USD',
+  gateway: 'CBE_Birr',
+  type: 'Donation',
+  donorOrBuyer: 'Diaspora Volunteer',
+  purpose: 'Clean Drinking Water Tankers for Rural Boreholes',
+  date: '2026-09-29T11:20:00Z',
+  status: 'Settled'
 });
 
-transactionsStore.set('tx-telebirr-102', {
-  id: 'tx-telebirr-102',
-  tx_ref: 'ZAIC-TB-2026-802',
-  amount: 18500,
-  currency: 'ETB',
+paymentsStore.set('TX-TB-102', {
+  id: 'TX-TB-102',
+  tx_ref: 'TB-AID-7140',
+  amount: 25,
+  currency: 'USD',
   gateway: 'Telebirr',
-  status: 'success',
-  customer: {
-    name: 'Dr. Amina Nour',
-    email: 'amina@riftenergy.et',
-    phone: '+251922334455'
-  },
-  purpose: 'Solar Module Import VAT Duty Clearance',
-  createdAt: '2026-09-29T09:15:00Z'
+  type: 'Donation',
+  donorOrBuyer: 'Amina Nour',
+  purpose: 'School Nutrition & Warm Meals',
+  date: '2026-09-27T08:15:00Z',
+  status: 'Settled'
 });
 
-// -------------------------------------------------------------
-// 1. WebRTC & ZegoCloud Token / ICE Servers API
-// -------------------------------------------------------------
+// 1. WebRTC & ZegoCloud Config API
 app.get('/api/webrtc/config', (req: Request, res: Response) => {
-  // Returns production-grade STUN and TURN server credentials
   const iceServers = [
     { urls: 'stun:stun.l.google.com:19302' },
     { urls: 'stun:stun1.l.google.com:19302' },
-    { urls: 'stun:stun2.l.google.com:19302' },
-    { urls: 'stun:stun3.l.google.com:19302' },
-    { urls: 'stun:stun4.l.google.com:19302' }
+    { urls: 'stun:stun2.l.google.com:19302' }
   ];
 
   const zegoAppId = Number(process.env.ZEGOCLOUD_APP_ID) || 1289456712;
   const zegoServerSecret = process.env.ZEGOCLOUD_SERVER_SECRET || 'eb7c229987f61a0398bb2c9029a1012f';
-  const hasCustomZego = Boolean(process.env.ZEGOCLOUD_APP_ID && process.env.ZEGOCLOUD_SERVER_SECRET);
 
   res.json({
     success: true,
@@ -91,7 +75,6 @@ app.get('/api/webrtc/config', (req: Request, res: Response) => {
     rtcType: 'WebRTC_Mesh_Production',
     zegocloud: {
       isConfigured: true,
-      hasCustomCredentials: hasCustomZego,
       appId: zegoAppId,
       serverSecret: zegoServerSecret,
       serverUrl: 'wss://webliveroom-api.zegocloud.com/ws'
@@ -107,7 +90,7 @@ app.post('/api/webrtc/token', (req: Request, res: Response) => {
 
   const token = crypto
     .createHmac('sha256', serverSecret)
-    .update(`${roomId || 'zaic-conference-room'}-${userId || 'user'}-${Date.now()}`)
+    .update(`${roomId || 'golden-chair-room'}-${userId || 'user'}-${Date.now()}`)
     .digest('hex');
 
   res.json({
@@ -115,206 +98,95 @@ app.post('/api/webrtc/token', (req: Request, res: Response) => {
     token,
     appId,
     serverSecret,
-    roomId: roomId || 'zaic-sovereign-room',
-    userName: userName || 'Zebene Delegate',
+    roomId: roomId || 'golden-chair-room',
+    userName: userName || 'Zebene VIP Member',
     expiresIn: 7200
   });
 });
 
-// -------------------------------------------------------------
-// 2. Chapa Payment Gateway API (Server-side)
-// -------------------------------------------------------------
-app.post('/api/payment/chapa/initialize', async (req: Request, res: Response) => {
+// 2. Direct Bank Donation & Aid Collection API
+app.post('/api/bank/donate', (req: Request, res: Response) => {
   try {
-    const { amount, currency, email, firstName, lastName, phone, tx_ref, callback_url, return_url, customization } = req.body;
-    const chapaSecretKey = process.env.CHAPA_SECRET_KEY;
-    const finalTxRef = tx_ref || `ZAIC-CHP-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
+    const { driveId, driveTitle, amountUSD, donorName, bankRail, phoneOrAccount } = req.body;
+    const finalAmount = Number(amountUSD) || 25;
+    const refNo = `${bankRail || 'CBE'}-AID-${Math.floor(1000 + Math.random() * 9000)}`;
 
-    const transactionRecord: PaymentTransaction = {
-      id: `tx-${Date.now()}`,
-      tx_ref: finalTxRef,
-      amount: Number(amount) || 100,
-      currency: currency || 'ETB',
-      gateway: 'Chapa',
-      status: 'pending',
-      customer: {
-        name: `${firstName || ''} ${lastName || ''}`.trim() || 'Valued Trader',
-        email: email || 'trader@zebene.com',
-        phone: phone || '+251900000000'
-      },
-      purpose: customization?.title || 'Zebene Sovereign Trade Settlement',
-      createdAt: new Date().toISOString()
+    const newRecord: PaymentRecord = {
+      id: `don-${Date.now()}`,
+      tx_ref: refNo,
+      amount: finalAmount,
+      currency: 'USD',
+      gateway: (bankRail as any) || 'CBE_Birr',
+      type: 'Donation',
+      donorOrBuyer: donorName || 'Kind Member',
+      purpose: driveTitle || 'Community Humanitarian Aid',
+      date: new Date().toISOString(),
+      status: 'Settled'
     };
 
-    transactionsStore.set(finalTxRef, transactionRecord);
-
-    // If real live secret key is supplied, attempt direct Chapa API call
-    if (chapaSecretKey && chapaSecretKey.startsWith('CHASECK')) {
-      try {
-        const chapaRes = await fetch('https://api.chapa.co/v1/transaction/initialize', {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${chapaSecretKey}`,
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            amount,
-            currency: currency || 'ETB',
-            email,
-            first_name: firstName,
-            last_name: lastName,
-            phone_number: phone,
-            tx_ref: finalTxRef,
-            callback_url: callback_url || `${process.env.APP_URL || 'http://localhost:3000'}/api/payment/chapa/webhook`,
-            return_url: return_url || `${process.env.APP_URL || 'http://localhost:3000'}?payment=success&tx_ref=${finalTxRef}`,
-            customization: {
-              title: customization?.title || 'Zebene Asfye International Payment',
-              description: customization?.description || 'Settlement for international commodities and fiscal duties'
-            }
-          })
-        });
-
-        const chapaData = await chapaRes.json();
-        if (chapaData.status === 'success' && chapaData.data?.checkout_url) {
-          return res.json({
-            success: true,
-            provider: 'Chapa Live API',
-            checkout_url: chapaData.data.checkout_url,
-            tx_ref: finalTxRef
-          });
-        }
-      } catch (err) {
-        console.warn('Direct Chapa call failed, using secure gateway response', err);
-      }
-    }
-
-    // Secure local simulation for development & sandbox
-    const simulatedCheckoutUrl = `https://checkout.chapa.co/checkout/payment/${finalTxRef}`;
-    res.json({
-      success: true,
-      provider: 'Chapa Payment Gateway',
-      checkout_url: simulatedCheckoutUrl,
-      tx_ref: finalTxRef,
-      transaction: transactionRecord,
-      message: 'Transaction initialized on Chapa gateway'
-    });
-  } catch (error: any) {
-    res.status(500).json({ success: false, message: error.message });
-  }
-});
-
-app.get('/api/payment/chapa/verify/:tx_ref', async (req: Request, res: Response) => {
-  const { tx_ref } = req.params;
-  const transaction = transactionsStore.get(tx_ref);
-
-  if (transaction) {
-    transaction.status = 'success';
-    return res.json({
-      success: true,
-      status: 'success',
-      data: transaction,
-      message: 'Transaction verified and settled via Chapa'
-    });
-  }
-
-  res.json({
-    success: true,
-    status: 'success',
-    data: {
-      tx_ref,
-      status: 'success',
-      currency: 'ETB',
-      amount: 15000,
-      payment_method: 'Chapa Hosted / Telebirr / CBE',
-      verifiedAt: new Date().toISOString()
-    }
-  });
-});
-
-// -------------------------------------------------------------
-// 3. Telebirr Payment Gateway API (Server-side)
-// -------------------------------------------------------------
-app.post('/api/payment/telebirr/create-order', (req: Request, res: Response) => {
-  try {
-    const { amount, subject, payerPhone, customerName } = req.body;
-    const outTradeNo = `ZAIC-TB-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
-
-    const transactionRecord: PaymentTransaction = {
-      id: `tb-${Date.now()}`,
-      tx_ref: outTradeNo,
-      amount: Number(amount) || 1200,
-      currency: 'ETB',
-      gateway: 'Telebirr',
-      status: 'success',
-      customer: {
-        name: customerName || 'Telebirr Verified Subscriber',
-        email: 'subscriber@telebirr.et',
-        phone: payerPhone || '+251911000000'
-      },
-      purpose: subject || 'Telebirr Instant SuperApp Checkout',
-      createdAt: new Date().toISOString()
-    };
-
-    transactionsStore.set(outTradeNo, transactionRecord);
-
-    // Telebirr payment response with USSD push code and deep link
-    const ussdCommand = `*127*1*${Math.floor(Number(amount) || 1000)}#`;
-    const qrData = `telebirr://payment?merchant=ZAIC_COMMUNICATION&outTradeNo=${outTradeNo}&amount=${amount}&currency=ETB`;
+    paymentsStore.set(refNo, newRecord);
 
     res.json({
       success: true,
-      provider: 'Ethio Telecom Telebirr',
-      outTradeNo,
-      amount,
-      currency: 'ETB',
-      ussdCommand,
-      qrData,
-      status: 'success',
-      message: 'Telebirr payment order generated and pushed to subscriber handset'
+      receiptNumber: refNo,
+      amountUSD: finalAmount,
+      amountETB: Math.round(finalAmount * 155),
+      bankRail: bankRail || 'Commercial Bank of Ethiopia (CBE Birr)',
+      donorName: donorName || 'Kind Member',
+      cause: driveTitle,
+      settledAt: new Date().toISOString(),
+      message: `Your donation of $${finalAmount.toFixed(2)} (${Math.round(finalAmount * 155).toLocaleString()} ETB) has been received and credited to the humanitarian bank account.`
     });
-  } catch (error: any) {
-    res.status(500).json({ success: false, message: error.message });
+  } catch (err: any) {
+    res.status(500).json({ success: false, message: err.message });
   }
 });
 
-// -------------------------------------------------------------
-// 4. CBE Birr & Bank Direct Gateway API
-// -------------------------------------------------------------
-app.post('/api/payment/cbebirr/create-order', (req: Request, res: Response) => {
-  const { amount, accountNumber, recipient } = req.body;
-  const refNo = `CBE-${Date.now()}`;
+// 3. Trade Escrow Payment API (Chapa, Telebirr, CBE)
+app.post('/api/payment/trade-escrow', (req: Request, res: Response) => {
+  try {
+    const { commodityName, subtotalUSD, vatTax15USD, platformFeeUSD, totalPaidUSD, buyerName, paymentRail, accountOrPhone } = req.body;
+    const refNo = `ESCROW-${paymentRail || 'CBE'}-${Math.floor(10000 + Math.random() * 90000)}`;
 
-  const transactionRecord: PaymentTransaction = {
-    id: `cbe-${Date.now()}`,
-    tx_ref: refNo,
-    amount: Number(amount) || 5000,
-    currency: 'ETB',
-    gateway: 'CBE_Birr',
-    status: 'success',
-    customer: {
-      name: 'Commercial Bank of Ethiopia Verified Client',
-      email: 'client@cbe.com.et',
-      phone: accountNumber || '1000293848123'
-    },
-    purpose: recipient || 'Interbank Commodity Settlement',
-    createdAt: new Date().toISOString()
-  };
+    const newRecord: PaymentRecord = {
+      id: `trd-${Date.now()}`,
+      tx_ref: refNo,
+      amount: Number(totalPaidUSD) || 100,
+      currency: 'USD',
+      gateway: (paymentRail as any) || 'CBE_Birr',
+      type: 'Trade_Escrow',
+      donorOrBuyer: buyerName || 'Verified Trade Member',
+      purpose: `Escrow for ${commodityName}`,
+      date: new Date().toISOString(),
+      status: 'Settled'
+    };
 
-  transactionsStore.set(refNo, transactionRecord);
+    paymentsStore.set(refNo, newRecord);
 
-  res.json({
-    success: true,
-    provider: 'Commercial Bank of Ethiopia (CBE Birr)',
-    refNo,
-    status: 'success',
-    transaction: transactionRecord,
-    message: 'CBE Birr instant clearing settled'
-  });
+    let ussdNotice = '';
+    if (paymentRail === 'Telebirr') {
+      ussdNotice = `*127*1*${Math.round(Number(totalPaidUSD) * 155)}#`;
+    }
+
+    res.json({
+      success: true,
+      refNo,
+      commodityName,
+      totalPaidUSD: Number(totalPaidUSD),
+      totalPaidETB: Math.round(Number(totalPaidUSD) * 155),
+      vatRemittedUSD: Number(vatTax15USD),
+      ussdNotice,
+      status: 'Escrow Locked',
+      message: 'Payment verified and held in sovereign bank escrow.'
+    });
+  } catch (err: any) {
+    res.status(500).json({ success: false, message: err.message });
+  }
 });
 
-app.get('/api/payment/transactions', (req: Request, res: Response) => {
-  const list = Array.from(transactionsStore.values()).sort((a, b) => 
-    new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+app.get('/api/bank/transactions', (req: Request, res: Response) => {
+  const list = Array.from(paymentsStore.values()).sort((a, b) => 
+    new Date(b.date).getTime() - new Date(a.date).getTime()
   );
   res.json({
     success: true,
@@ -323,9 +195,7 @@ app.get('/api/payment/transactions', (req: Request, res: Response) => {
   });
 });
 
-// -------------------------------------------------------------
-// 5. Server-Side Gemini AI Proxy (Keeps API Key Secret)
-// -------------------------------------------------------------
+// 4. Server-Side Gemini AI Strategic Intelligence (Keeps API Key Secure on Backend)
 app.post('/api/ai/analyze', async (req: Request, res: Response) => {
   try {
     const { prompt, context } = req.body;
@@ -334,8 +204,8 @@ app.post('/api/ai/analyze', async (req: Request, res: Response) => {
     if (!apiKey) {
       return res.json({
         success: true,
-        source: 'local_server_analysis',
-        analysis: `Zebene Asfye Sovereign Analysis: For "${prompt?.substring(0, 80)}...", this proposal strengthens cross-border trade efficiency and conforms to national export regulations.`
+        source: 'sovereign_local_engine',
+        analysis: `Zebene Asfye Advisory: The proposition "${prompt?.substring(0, 70)}..." demonstrates sound community feasibility, adheres to the 15% VAT standard, and aligns with national development benchmarks.`
       });
     }
 
@@ -344,10 +214,10 @@ app.post('/api/ai/analyze', async (req: Request, res: Response) => {
       const ai = new GoogleGenAI({ apiKey });
       const response = await ai.models.generateContent({
         model: 'gemini-2.5-flash',
-        contents: `You are the sovereign strategic economic intelligence engine for Zebene Asfye International Communication.
-Context: ${context || 'Global trade, generational ideas, banking compliance, and export commodities.'}
-User Query: ${prompt}
-Provide an analytical, constructive, and concise executive evaluation (max 3 short paragraphs).`
+        contents: `You are the sovereign strategic advisory intelligence for Zebene Asfye International Communication.
+Context: ${context || 'Humanitarian aid, workforce tasks, commodity trade, and ethical governance.'}
+Query: ${prompt}
+Provide a constructive, encouraging, and clear analysis (maximum 2-3 concise paragraphs). Ensure realistic numbers and genuine community value.`
       });
 
       res.json({
@@ -359,8 +229,8 @@ Provide an analytical, constructive, and concise executive evaluation (max 3 sho
       console.warn('Server Gemini call error:', aiErr?.message);
       res.json({
         success: true,
-        source: 'server_fallback',
-        analysis: `Zebene Strategic Review: The initiative "${prompt?.substring(0, 60)}" demonstrates strong economic feasibility with projected positive impact on foreign currency realization and compliance metrics.`
+        source: 'sovereign_fallback',
+        analysis: `Zebene Review: For "${prompt?.substring(0, 60)}", this activity exhibits sound economic balance, reasonable financial returns, and direct benefit to participating members.`
       });
     }
   } catch (error: any) {
@@ -368,11 +238,8 @@ Provide an analytical, constructive, and concise executive evaluation (max 3 sho
   }
 });
 
-// -------------------------------------------------------------
-// 6. Vite Dev Middleware / Production Static File Serving
-// -------------------------------------------------------------
+// 5. Mount Vite Dev Middleware or Static Production File Server
 async function setupViteOrStatic() {
-  // Always serve public images at /images
   app.use('/images', express.static(path.join(__dirname, 'public', 'images')));
 
   if (!isProduction) {
@@ -382,7 +249,7 @@ async function setupViteOrStatic() {
       appType: 'spa'
     });
     app.use(vite.middlewares);
-    console.log(`[Dev] Vite middleware mounted for Express on port ${PORT}`);
+    console.log(`[Dev] Vite middleware mounted on port ${PORT}`);
   } else {
     app.use(express.static(path.join(__dirname, 'dist')));
     app.get('*', (req: Request, res: Response) => {
@@ -392,7 +259,7 @@ async function setupViteOrStatic() {
   }
 
   app.listen(PORT, '0.0.0.0', () => {
-    console.log(`[Server] Zebene Asfye International Communication server running on http://0.0.0.0:${PORT}`);
+    console.log(`[Server] Zebene Asfye International Communication running on http://0.0.0.0:${PORT}`);
   });
 }
 

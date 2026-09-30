@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { KeyRound, ShieldAlert, CheckCircle2, Lock, ArrowRight, Sparkles } from 'lucide-react';
+import { KeyRound, ShieldAlert, CheckCircle2, Lock, Sparkles, Crown } from 'lucide-react';
 
 interface MasterKeyPromptModalProps {
   isOpen: boolean;
@@ -18,7 +18,6 @@ export const MasterKeyPromptModal: React.FC<MasterKeyPromptModalProps> = ({
 }) => {
   const [enteredKey, setEnteredKey] = useState('');
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const [successAnimation, setSuccessAnimation] = useState(false);
 
   if (!isOpen) return null;
 
@@ -26,47 +25,31 @@ export const MasterKeyPromptModal: React.FC<MasterKeyPromptModalProps> = ({
     e.preventDefault();
     if (enteredKey.trim() === '1224') {
       setErrorMessage(null);
-      setSuccessAnimation(true);
-      setTimeout(() => {
-        setSuccessAnimation(false);
-        setEnteredKey('');
-        onUnlockSuccess();
-        onClose();
-      }, 700);
+      setEnteredKey('');
+      onUnlockSuccess();
+      onClose();
     } else {
-      setErrorMessage('Access Denied. Invalid Master Builder Key. Please enter the valid key: 1224.');
+      setErrorMessage('Access Denied. Invalid Master Key. Enter the secret number 1224.');
     }
-  };
-
-  const handlePadClick = (num: string) => {
-    if (enteredKey.length < 8) {
-      setEnteredKey(prev => prev + num);
-      setErrorMessage(null);
-    }
-  };
-
-  const handleBackspace = () => {
-    setEnteredKey(prev => prev.slice(0, -1));
-    setErrorMessage(null);
   };
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/85 p-4 backdrop-blur-md">
-      <div className="w-full max-w-md rounded-2xl border border-amber-500/40 bg-slate-900 p-6 sm:p-8 shadow-2xl space-y-6">
+      <div className="w-full max-w-md rounded-3xl border border-amber-500/40 bg-slate-900 p-6 sm:p-8 shadow-2xl space-y-6">
         
         {/* Header */}
         <div className="flex items-start justify-between border-b border-slate-800 pb-4">
           <div className="flex items-center gap-3">
-            <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-amber-500/10 border border-amber-500/40 text-amber-400">
+            <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-amber-500/10 border border-amber-500/40 text-amber-400">
               <KeyRound className="h-6 w-6" />
             </div>
             <div>
               <div className="flex items-center gap-1.5 text-[10px] font-mono font-bold uppercase tracking-wider text-amber-400">
                 <Sparkles className="h-3 w-3" />
-                <span>Founder Authority</span>
+                <span>Builder Authority</span>
               </div>
-              <h2 className="text-lg font-bold text-white leading-tight">
-                Master Builder Key Authentication
+              <h2 className="text-lg font-bold font-display text-white">
+                Master Secret Key Authentication
               </h2>
             </div>
           </div>
@@ -86,98 +69,59 @@ export const MasterKeyPromptModal: React.FC<MasterKeyPromptModalProps> = ({
             <div className="space-y-1">
               <h3 className="text-base font-bold text-white">Master Builder Key Active</h3>
               <p className="text-xs text-slate-400">
-                You have full sovereign administrator control over all website systems and participants.
+                You have sovereign administrator authority over all system controls and country demographics.
               </p>
             </div>
 
             <div className="pt-2 flex flex-col gap-2">
               <button
                 onClick={onClose}
-                className="w-full rounded-lg bg-amber-500 py-2.5 text-xs font-bold uppercase tracking-wider text-slate-950 hover:bg-amber-400 transition-colors cursor-pointer"
+                className="w-full rounded-xl bg-amber-500 py-3 text-xs font-bold uppercase tracking-wider text-slate-950 hover:bg-amber-400 transition-colors cursor-pointer"
               >
-                Open Master Control Console
+                Open Master Console
               </button>
               <button
-                onClick={() => {
-                  onLockMaster();
-                  onClose();
-                }}
-                className="w-full rounded-lg border border-slate-700 bg-slate-800 py-2.5 text-xs font-medium text-slate-300 hover:text-rose-300 hover:bg-slate-700 transition-colors cursor-pointer"
+                onClick={() => { onLockMaster(); onClose(); }}
+                className="w-full rounded-xl border border-slate-700 bg-slate-950 py-2.5 text-xs font-semibold text-slate-400 hover:text-white"
               >
-                Lock Master Access
+                Lock Master Authority
               </button>
             </div>
           </div>
         ) : (
-          <form onSubmit={handleKeySubmit} className="space-y-5">
-            <div className="space-y-1 text-center">
+          <form onSubmit={handleKeySubmit} className="space-y-4">
+            <div className="text-center space-y-1">
               <p className="text-xs text-slate-300 leading-relaxed">
-                Enter the secret master key to easily command all website systems, participant accounts, banking rails, and trade controls.
+                Enter the secret number <strong className="text-amber-300 font-mono">1224</strong> assigned to the builder of the website to control all systems and view registered members worldwide.
               </p>
             </div>
 
-            {/* Key Input Box */}
-            <div className="space-y-2">
-              <div className="relative">
-                <input
-                  type="password"
-                  autoFocus
-                  maxLength={10}
-                  placeholder="Enter Key (1224)"
-                  value={enteredKey}
-                  onChange={(e) => {
-                    setEnteredKey(e.target.value);
-                    setErrorMessage(null);
-                  }}
-                  className={`w-full rounded-xl border bg-slate-950 py-3.5 px-4 text-center font-mono text-2xl font-bold tracking-widest text-amber-400 focus:outline-none transition-colors ${
-                    errorMessage ? 'border-rose-500 ring-1 ring-rose-500' : 'border-slate-800 focus:border-amber-500'
-                  }`}
-                />
-              </div>
-
-              {errorMessage && (
-                <div className="flex items-center gap-1.5 text-xs text-rose-400 font-medium justify-center">
-                  <ShieldAlert className="h-3.5 w-3.5 shrink-0" />
-                  <span>{errorMessage}</span>
-                </div>
-              )}
-
-              {successAnimation && (
-                <div className="flex items-center gap-1.5 text-xs text-emerald-400 font-bold justify-center animate-pulse">
-                  <CheckCircle2 className="h-4 w-4" />
-                  <span>Master Key Verified! Initializing Sovereign Control...</span>
-                </div>
-              )}
+            <div className="flex justify-center">
+              <input
+                type="password"
+                maxLength={4}
+                autoFocus
+                placeholder="• • • •"
+                value={enteredKey}
+                onChange={(e) => {
+                  setEnteredKey(e.target.value.replace(/[^0-9]/g, ''));
+                  setErrorMessage(null);
+                }}
+                className="w-48 text-center tracking-[0.8em] text-3xl font-mono font-bold py-3 rounded-2xl border-2 border-amber-500/60 bg-slate-950 text-amber-400 focus:outline-none focus:border-amber-400 shadow-inner"
+              />
             </div>
 
-            {/* Quick PIN Keypad */}
-            <div className="grid grid-cols-3 gap-2 max-w-[260px] mx-auto pt-1">
-              {['1', '2', '3', '4', '5', '6', '7', '8', '9', 'C', '0', '⌫'].map((k) => (
-                <button
-                  key={k}
-                  type="button"
-                  onClick={() => {
-                    if (k === 'C') setEnteredKey('');
-                    else if (k === '⌫') handleBackspace();
-                    else handlePadClick(k);
-                  }}
-                  className="rounded-lg border border-slate-800 bg-slate-950/70 p-2.5 font-mono text-sm font-semibold text-slate-200 hover:border-amber-500/50 hover:bg-slate-800 hover:text-white transition-colors cursor-pointer"
-                >
-                  {k}
-                </button>
-              ))}
-            </div>
+            {errorMessage && (
+              <p className="text-xs text-rose-400 text-center font-medium">{errorMessage}</p>
+            )}
 
-            <div className="pt-2">
-              <button
-                type="submit"
-                className="w-full flex items-center justify-center gap-2 rounded-xl bg-amber-500 py-3 text-xs font-bold uppercase tracking-wider text-slate-950 hover:bg-amber-400 transition-colors shadow-lg cursor-pointer"
-              >
-                <Lock className="h-3.5 w-3.5" />
-                <span>Unlock Master Control (Key: 1224)</span>
-                <ArrowRight className="h-3.5 w-3.5" />
-              </button>
-            </div>
+            <button
+              type="submit"
+              className="w-full py-3 rounded-xl bg-gradient-to-r from-amber-400 to-amber-500 text-slate-950 font-bold uppercase tracking-wider text-xs hover:from-amber-300 hover:to-amber-400 transition-all shadow-lg cursor-pointer flex items-center justify-center gap-2"
+            >
+              <Lock className="h-4 w-4" />
+              <span>Unlock Builder Console (1224)</span>
+            </button>
           </form>
         )}
       </div>

@@ -1,666 +1,824 @@
-import {
-  Currency,
-  CurrencyRate,
-  InformationItem,
-  IdeaItem,
-  GameQuestion,
-  TradeProduct,
-  TradeOrder,
-  BankConnector,
-  ComplianceLaw,
-  TaxRecord,
-  SOPProcedure,
-  ParticipantProfile
+import { 
+  HumanitarianAidDrive, 
+  WorkforceTask, 
+  TradeCommodity, 
+  TradeTransaction, 
+  LiveChatMessage, 
+  CountryStatistic,
+  MemberProfile,
+  ThroneDefinition,
+  WorldAward,
+  LaureateNominee,
+  LotteryPrize,
+  LotteryTicket,
+  PastLotteryWinner
 } from '../types';
 
-export const CURRENCY_RATES: Record<Currency, CurrencyRate> = {
-  USD: { symbol: '$', rateToUSD: 1.0 },
-  ETB: { symbol: 'ETB ', rateToUSD: 128.5 }, // Market-aligned rate
-  EUR: { symbol: '€', rateToUSD: 0.92 },
-  GBP: { symbol: '£', rateToUSD: 0.78 },
-  AED: { symbol: 'AED ', rateToUSD: 3.67 }
-};
-
-export const INITIAL_INFORMATION: InformationItem[] = [
+export const INITIAL_MEMBERS: MemberProfile[] = [
   {
-    id: 'INF-2026-001',
-    title: 'East African Cross-Border Grain & Coffee Export Clearance Circular',
-    category: 'Trade Advisory',
-    accessLevel: 'Public Worldwide',
-    date: '2026-09-24',
-    author: 'Directorate of Foreign Trade',
-    organization: 'Ministry of Trade & Regional Integration',
-    verificationHash: 'SHA256: 8e91c7a421b03fc2919d7d3b',
-    content: 'All certified trading entities under the Zebene framework are authorized for expedited multimodal logistics corridors. Standard Phytosanitary and Origin validation requirements apply with single-window digital stamp clearance.',
-    tags: ['Export', 'Coffee', 'Logistics', 'Customs'],
-    downloadsCount: 1420
-  },
-  {
-    id: 'INF-2026-002',
-    title: 'National Bank Liquidity Harmonization & Foreign Exchange Retention Directive',
-    category: 'Financial Circular',
-    accessLevel: 'Commercial Banks Only',
-    date: '2026-09-26',
-    author: 'Governor Directorate',
-    organization: 'National Central Banking Consortium',
-    verificationHash: 'SHA256: 3a10bf89901efc2005a812da',
-    content: 'Interbank electronic clearing settlement via Zebene protocol adheres to ISO 20022 message specifications. Withholding taxes on foreign currency swaps shall be credited automatically to the state treasury account.',
-    tags: ['Banking', 'ISO20022', 'Forex', 'Treasury'],
-    downloadsCount: 890
-  },
-  {
-    id: 'INF-2026-003',
-    title: 'Generational Renewable Infrastructure & Solar Microgrid Roadmap 2026-2030',
-    category: 'Economic Bulletin',
-    accessLevel: 'Public Worldwide',
-    date: '2026-09-27',
-    author: 'High Commission for Green Growth',
-    organization: 'Sustainable Development Council',
-    verificationHash: 'SHA256: b17fa602e1c9d4e51147a789',
-    content: 'Prioritizing decentralized mini-grids for agricultural processing stations. Trade tariffs for bifacial crystalline solar modules imported through registered ports are adjusted under renewable incentive codes.',
-    tags: ['Renewables', 'Green Economy', 'Solar', 'Generational'],
-    downloadsCount: 2310
-  },
-  {
-    id: 'INF-2026-004',
-    title: 'Sovereign Sovereign-Level Strategic Mineral Stockpile Protocols',
-    category: 'Diplomatic & Sovereign',
-    accessLevel: 'Government & Sovereign',
-    date: '2026-09-28',
-    author: 'Council of Economic Security',
-    organization: 'State Ministerial Cabinet',
-    verificationHash: 'SHA256: f401c900e23adbb1945c9288',
-    content: 'Classified protocol detailing physical reserves of refined copper cathodes and rare earth materials held in designated depository bonded warehouses under electronic multi-sig vault control.',
-    tags: ['Sovereign', 'Metals', 'National Reserve', 'Security'],
-    downloadsCount: 145
-  },
-  {
-    id: 'INF-2026-005',
-    title: 'Organic Sesame & Oilseeds Quality Grading Certification Standards',
-    category: 'Agricultural Intel',
-    accessLevel: 'Verified Trade Partners',
-    date: '2026-09-29',
-    author: 'Commodity Quality & Purity Laboratory',
-    organization: 'Agricultural Transformation Agency',
-    verificationHash: 'SHA256: 77a0bc5516edc8812f009941',
-    content: 'Humera and Wollega white sesame lots must conform to minimum 99.5% purity benchmarks with moisture below 6.0%. Laboratory verification certificates are signed onto the Zebene digital ledger.',
-    tags: ['Agriculture', 'Sesame', 'Purity', 'Standards'],
-    downloadsCount: 1105
-  }
-];
-
-export const INITIAL_IDEAS: IdeaItem[] = [
-  {
-    id: 'IDEA-101',
-    title: 'Solar-Powered Drip Irrigation Network for Highland Smallholders',
-    author: 'Kaleb Tadesse & Regional AgTech Circle',
-    country: 'Ethiopia & East Africa',
-    category: 'Sustainable Agriculture',
-    description: 'A modular, low-pressure gravity drip irrigation system energized by 250W solar pumps, cutting diesel fuel expenses by 95% and boosting vegetable crop yield across dry seasons.',
-    impactScore: 94,
-    giftTokensReceived: 480,
-    date: '2026-09-22',
-    status: 'Implemented in Pilot'
-  },
-  {
-    id: 'IDEA-102',
-    title: 'Decentralized Cold-Chain Storage at Rural Farm Cooperative Gates',
-    author: 'Amina Nour & Youth Engineering Guild',
-    country: 'Kenya / Regional Corridor',
-    category: 'Clean Energy & Water',
-    description: 'Evaporative cooling and solar-thermal chilling sheds that preserve harvested avocado and leafy crops for up to 21 days without grid electricity, drastically reducing post-harvest waste.',
-    impactScore: 91,
-    giftTokensReceived: 350,
-    date: '2026-09-25',
-    status: 'Reviewed'
-  },
-  {
-    id: 'IDEA-103',
-    title: 'National Open-Curriculum Digital STEM Kits for Rural Secondary Schools',
-    author: 'Dr. Yonas Bekele',
-    country: 'Ethiopia',
-    category: 'Generational Education',
-    description: 'Offline-first, ruggedized microcomputers with preloaded science experiments, vocational coding lessons, and interactive civic engineering tutorials for youth in remote areas.',
-    impactScore: 89,
-    giftTokensReceived: 510,
-    date: '2026-09-27',
-    status: 'Incubating'
-  },
-  {
-    id: 'IDEA-104',
-    title: 'Biomass Briquette Production from Agricultural Coffee Husk Waste',
-    author: 'Green Fuel Youth Cooperative',
-    country: 'International / Sub-Saharan',
-    category: 'Civic Infrastructure',
-    description: 'Converting hundreds of tons of coffee processing husks into clean, smokeless cooking fuel briquettes to halt deforestation and generate employment for young community members.',
-    impactScore: 88,
-    giftTokensReceived: 420,
-    date: '2026-09-28',
-    status: 'Reviewed'
-  }
-];
-
-export const GAME_QUESTIONS: GameQuestion[] = [
-  {
-    id: 1,
-    question: 'Which international framework guarantees fair trade, sustainable production, and food security principles across modern generations?',
-    category: 'Global Ethics & Sustainability',
-    options: [
-      'UN Sustainable Development Goals (SDG 2 & SDG 12)',
-      'Speculative High-Frequency Arbitrage Protocol',
-      'Unrestricted Offshore Deregulation Accord',
-      'Short-term Commodity Extraction Doctrine'
-    ],
-    correctIndex: 0,
-    explanation: 'UN SDG 2 (Zero Hunger) and SDG 12 (Responsible Consumption & Production) enshrine generational protection and fair market exchange across borders.',
-    giftReward: '50 Zebene Impact Tokens + Civic Pioneer Badge'
-  },
-  {
-    id: 2,
-    question: 'How does modern high-efficiency agricultural cold-chain logistics impact national economic development?',
-    category: 'National Economic Resilience',
-    options: [
-      'Increases crop transit waste and consumer prices',
-      'Preserves harvest value, reduces 40% post-harvest loss, and strengthens foreign exchange earnings',
-      'Only benefits non-producer overseas intermediaries',
-      'Depletes regional water reserves unnecessarily'
-    ],
-    correctIndex: 1,
-    explanation: 'Preserving perishable commodities guarantees higher export realization, stabilizes domestic food reserves, and directly raises farmer incomes.',
-    giftReward: '75 Zebene Impact Tokens + Agricultural Steward Trophy'
-  },
-  {
-    id: 3,
-    question: 'What is the primary objective of international Anti-Money Laundering (AML) and FATF standards in digital commerce?',
-    category: 'International Financial Laws',
-    options: [
-      'Slow down legitimate business exchanges arbitrarily',
-      'Prevent illicit capital flight, terrorism financing, and ensure verifiable integrity of bank settlements',
-      'Eliminate sovereign central banks completely',
-      'Impose secret commissions without state audit'
-    ],
-    correctIndex: 1,
-    explanation: 'FATF international recommendations safeguard global financial systems against fraud and corruption while verifying legitimate economic actors.',
-    giftReward: '60 Zebene Impact Tokens + Sovereign Compliance Seal'
-  },
-  {
-    id: 4,
-    question: 'In the Zebene financial model, how are government business taxes and bank stamp duties handled?',
-    category: 'Tax & Fiscal Governance',
-    options: [
-      'Ignored or concealed in offshore accounts',
-      'Deducted automatically at trade execution and remitted directly to the national revenue authority & partner banks with verifiable filing numbers',
-      'Paid only if voluntary donations are requested',
-      'Transferred into private speculative funds'
-    ],
-    correctIndex: 1,
-    explanation: 'The Zebene system guarantees 100% tax transparency, calculating VAT, business profit tax, and bank stamp duties instantaneously with zero leakage.',
-    giftReward: '100 Zebene Impact Tokens + Fiscal Honor Certificate'
-  }
-];
-
-export const TRADE_PRODUCTS: TradeProduct[] = [
-  {
-    id: 'PRD-01',
-    name: 'Washed Arabica Coffee Beans (Grade 1 Yirgacheffe / Sidama)',
-    category: 'Agricultural Commodity',
-    priceUSD: 6850,
-    unit: 'Metric Ton (1,000 kg)',
-    change24h: 2.4,
-    stockAvailable: 1250,
-    originCountry: 'Ethiopia',
-    qualityGrade: 'Grade 1 Specialty / SCA Score 88.5',
-    image: '/images/product_coffee.jpg',
-    minOrderQuantity: 5,
-    incoterm: 'FOB',
-    description: 'Premier export-grade washed coffee beans with floral bergamot notes, bright citric acidity, and verified single-origin traceability from certified farmer coops.'
-  },
-  {
-    id: 'PRD-02',
-    name: 'Industrial Bifacial Solar Energy Panel Module (650W)',
-    category: 'Clean Tech & Energy',
-    priceUSD: 142,
-    unit: 'Unit Module (Pallet of 30)',
-    change24h: -1.2,
-    stockAvailable: 8400,
-    originCountry: 'International Certified Assembly',
-    qualityGrade: 'Tier 1 Photovoltaic / 22.8% Efficiency',
-    image: '/images/product_solar.jpg',
-    minOrderQuantity: 30,
-    incoterm: 'CIF',
-    description: 'Heavy-duty dual-glass solar panels engineered for extreme temperatures, high irradiance, and 30-year linear performance warranty for microgrids and industrial plants.'
-  },
-  {
-    id: 'PRD-03',
-    name: 'Premium White Humera Sesame Seeds (Machine Cleaned)',
-    category: 'Agricultural Commodity',
-    priceUSD: 2150,
-    unit: 'Metric Ton',
-    change24h: 1.8,
-    stockAvailable: 3100,
-    originCountry: 'Ethiopia',
-    qualityGrade: 'Purity 99.8% / Oil Content 54%',
-    image: '/images/product_coffee.jpg',
-    minOrderQuantity: 15,
-    incoterm: 'FOB',
-    description: 'Uniform white sesame seeds prized worldwide for tahini and confectionary oils, rigorously tested for aflatoxin compliance with digital phytosanitary ledger.'
-  },
-  {
-    id: 'PRD-04',
-    name: 'Electrolytic Copper Cathodes (Grade A Cu-CATH-1)',
-    category: 'Industrial Metals',
-    priceUSD: 9480,
-    unit: 'Metric Ton',
-    change24h: 0.6,
-    stockAvailable: 680,
-    originCountry: 'Central/East African Corridor',
-    qualityGrade: 'Purity 99.9935% (LME Approved Standard)',
-    image: '/images/product_solar.jpg',
-    minOrderQuantity: 10,
-    incoterm: 'CIF',
-    description: 'High-grade non-ferrous copper cathodes for electrical infrastructure, transformer manufacturing, and clean energy grid transmission lines.'
-  }
-];
-
-export const INITIAL_ORDERS: TradeOrder[] = [
-  {
-    id: 'TRD-2026-9901',
-    productId: 'PRD-01',
-    productName: 'Washed Arabica Coffee Beans (Grade 1)',
-    quantity: 18,
-    totalUSD: 123300,
-    buyer: 'Antwerp Global Coffee Importers NV',
-    seller: 'Oromia Coffee Farmers Cooperative Union',
-    bankPartner: 'Commercial Bank of Ethiopia',
-    taxAmountUSD: 18495, // 15% VAT / Export Tax
-    ownerFeeUSD: 2281.05, // 1.85% owner commission
-    status: 'Completed',
-    date: '2026-09-25'
-  },
-  {
-    id: 'TRD-2026-9902',
-    productId: 'PRD-02',
-    productName: 'Industrial Bifacial Solar Energy Panel Module',
-    quantity: 360,
-    totalUSD: 51120,
-    buyer: 'Rift Valley Agro-Industrial Energy Consortium',
-    seller: 'Sovereign Clean Power Technologies',
-    bankPartner: 'African Development Bank',
-    taxAmountUSD: 7668,
-    ownerFeeUSD: 945.72,
-    status: 'In Transit',
-    date: '2026-09-27'
-  },
-  {
-    id: 'TRD-2026-9903',
-    productId: 'PRD-03',
-    productName: 'Premium White Humera Sesame Seeds',
-    quantity: 25,
-    totalUSD: 53750,
-    buyer: 'Middle East Agrico Foods Trading FZCO',
-    seller: 'Amhara Regional Farmers Export Federation',
-    bankPartner: 'Standard Chartered Global',
-    taxAmountUSD: 8062.5,
-    ownerFeeUSD: 994.38,
-    status: 'Escrow Secured',
-    date: '2026-09-28'
-  }
-];
-
-export const CONNECTED_BANKS: BankConnector[] = [
-  {
-    id: 'BNK-01',
-    name: 'Commercial Bank of Ethiopia (CBE)',
-    shortCode: 'CBE',
-    type: 'Commercial Bank',
-    country: 'Ethiopia',
-    swiftBic: 'CBETETAA',
-    connectionStatus: 'Operational',
-    liquidityPoolUSD: 148500000,
-    protocols: ['ISO 20022', 'SWIFT MT103', 'Direct Clearing RTGS'],
-    latencyMs: 18
-  },
-  {
-    id: 'BNK-02',
-    name: 'African Development Bank (AfDB)',
-    shortCode: 'AfDB',
-    type: 'Central / Development Bank',
-    country: 'Pan-African Sovereign',
-    swiftBic: 'AFDBABXX',
-    connectionStatus: 'Operational',
-    liquidityPoolUSD: 215000000,
-    protocols: ['Sovereign Trade Credit Rail', 'Development Loan Escrow'],
-    latencyMs: 32
-  },
-  {
-    id: 'BNK-03',
-    name: 'Standard Chartered Bank International',
-    shortCode: 'SCB',
-    type: 'International Clearing',
-    country: 'United Kingdom / UAE Hub',
-    swiftBic: 'SCBLGB2L',
-    connectionStatus: 'Operational',
-    liquidityPoolUSD: 89400000,
-    protocols: ['SWIFT gpi', 'Cross-Border FX Clearing', 'CHAPS'],
-    latencyMs: 24
-  },
-  {
-    id: 'BNK-04',
-    name: 'Federal Reserve Fedwire & Euroclear Node',
-    shortCode: 'FED-EUR',
-    type: 'International Clearing',
-    country: 'United States / European Union',
-    swiftBic: 'FRNYUS33',
-    connectionStatus: 'Operational',
-    liquidityPoolUSD: 310000000,
-    protocols: ['Fedwire Funds Service', 'Euroclear DVP', 'TARGET2'],
-    latencyMs: 41
-  }
-];
-
-export const COMPLIANCE_LAWS: ComplianceLaw[] = [
-  {
-    id: 'LAW-01',
-    title: 'Financial Action Task Force (FATF) Recommendations on AML/CFT',
-    organization: 'FATF Intergovernmental Body',
-    scope: 'Financial AML/CFT',
-    articles: 'Recommendations 10, 15, and 16 (Customer Due Diligence & Digital Wire Transfers)',
-    status: 'Compliant & Verified',
-    enforcementDate: 'Enforced Continuously',
-    details: 'Mandatory verified identity mapping for every trade participant, sender and beneficiary data transmission on every interbank movement, and automated PEP screening.'
-  },
-  {
-    id: 'LAW-02',
-    title: 'Basel Committee on Banking Supervision (Basel III/IV Standards)',
-    organization: 'Bank for International Settlements (BIS)',
-    scope: 'Banking Adequacy',
-    articles: 'Pillar 1 & Pillar 2 Capital Adequacy & Liquidity Coverage Ratio (LCR)',
-    status: 'Compliant & Verified',
-    enforcementDate: 'Audited Q3 2026',
-    details: 'All escrow trade pools held across connected partner banks maintain minimum 100% High-Quality Liquid Assets (HQLA) backing to withstand sovereign systemic stress.'
-  },
-  {
-    id: 'LAW-03',
-    title: 'African Continental Free Trade Area (AfCFTA) Rules of Origin & Customs',
-    organization: 'African Union Commission',
-    scope: 'Trade Ethics',
-    articles: 'Protocol on Trade in Goods, Annex 2 Rules of Origin',
-    status: 'Compliant & Verified',
-    enforcementDate: 'Active Continental Enforcement',
-    details: 'Automated value-addition calculation proving local manufacturing threshold (>35%) for preferential tariff treatment and reduction of import duties between signatory states.'
-  },
-  {
-    id: 'LAW-04',
-    title: 'United Nations Sustainable Development Goals (SDG 8 & SDG 9 Ethical Charter)',
-    organization: 'United Nations General Assembly',
-    scope: 'Environmental & SDG',
-    articles: 'Target 8.2 (Economic Productivity) & 9.4 (Sustainable Industrial Upgrades)',
-    status: 'Compliant & Verified',
-    enforcementDate: 'Annual Audit Passed',
-    details: 'Commitment to eradicate child labor, mandate fair trade pricing floors for smallholder agricultural goods, and incentivize clean renewable energy technology transfers.'
-  }
-];
-
-export const INITIAL_TAX_RECORDS: TaxRecord[] = [
-  {
-    id: 'TAX-2026-8801',
-    taxType: 'Value Added Tax (VAT 15%)',
-    sourceTransaction: 'TRD-2026-9901 (Coffee Export Batch)',
-    grossAmountUSD: 123300,
-    taxRatePercent: 15.0,
-    taxDeductedUSD: 18495,
-    recipientEntity: 'Federal Ministry of Finance',
-    status: 'Remitted',
-    filingNumber: 'ET-REV-VAT-891024-C',
-    date: '2026-09-25'
-  },
-  {
-    id: 'TAX-2026-8802',
-    taxType: 'Customs & Tariff',
-    sourceTransaction: 'TRD-2026-9902 (Solar Panel Import)',
-    grossAmountUSD: 51120,
-    taxRatePercent: 8.5,
-    taxDeductedUSD: 4345.2,
-    recipientEntity: 'Federal Ministry of Finance',
-    status: 'Remitted',
-    filingNumber: 'CUST-IMP-2026-44019',
-    date: '2026-09-27'
-  },
-  {
-    id: 'TAX-2026-8803',
-    taxType: 'Bank Stamp Duty',
-    sourceTransaction: 'Interbank SWIFT Settlement SCB-CBE',
-    grossAmountUSD: 228170,
-    taxRatePercent: 0.5,
-    taxDeductedUSD: 1140.85,
-    recipientEntity: 'National Bank Revenue Authority',
-    status: 'Remitted',
-    filingNumber: 'BNK-STAMP-99210-ET',
-    date: '2026-09-28'
-  },
-  {
-    id: 'TAX-2026-8804',
-    taxType: 'Withholding Tax (2%)',
-    sourceTransaction: 'TRD-2026-9903 (Sesame Seeds Batch)',
-    grossAmountUSD: 53750,
-    taxRatePercent: 2.0,
-    taxDeductedUSD: 1075,
-    recipientEntity: 'Federal Ministry of Finance',
-    status: 'Processed & Queued',
-    filingNumber: 'WHT-2026-004419',
-    date: '2026-09-29'
-  }
-];
-
-export const ZEBEN_PROCEDURES: SOPProcedure[] = [
-  {
-    stepNumber: 1,
-    title: 'Institutional Verification & Bank Onboarding',
-    objective: 'Establish verified enterprise identity with dual-signatory bank credentials.',
-    prerequisites: [
-      'Official Commercial Registration Certificate or TIN Number',
-      'Designated Partner Bank Account (CBE, AfDB, SCB or Fedwire-clearing)',
-      'Authorized corporate signatory passport / national biometric ID'
-    ],
-    instructions: [
-      'Navigate to the Banking module and select "Pair Verified Bank Account".',
-      'Enter the institution SWIFT BIC and national business registration code.',
-      'Authorize the micro-deposit or ISO 20022 digital handshake validation.',
-      'Upon clearance, a cryptographically signed Zebene Institutional Key is minted.'
-    ],
-    complianceLaw: 'FATF Recommendation 10 (Customer Due Diligence) & Basel III Adequacy',
-    notes: 'Member accounts are utility-only accounts. They operate as verified transactional participants without equity or dividend claims on the platform foundation.'
-  },
-  {
-    stepNumber: 2,
-    title: 'Information Exchange & Access Classification Protocol',
-    objective: 'Transmit or retrieve verified market advisories, agricultural bulletins, or legal notices under strict security tiers.',
-    prerequisites: [
-      'Active Verified Enterprise Identity',
-      'Designated classification privilege (Public, Trade Partner, Bank Only, Sovereign)'
-    ],
-    instructions: [
-      'Access the Information Exchange Center from the primary navigation.',
-      'Click "Publish Verified Information" and provide title, category, and document body.',
-      'Select the appropriate classification level: Public Worldwide, Verified Partners, Commercial Banks, or Sovereign Restricted.',
-      'The platform generates a unique cryptographic SHA-256 integrity hash before writing the record to the public ledger.'
-    ],
-    complianceLaw: 'Global Data Privacy & Transborder Data Flow Ethics Regulations',
-    notes: 'Unauthorized leak or misclassification of Sovereign documents triggers automatic temporary suspension of trade clearing privileges.'
-  },
-  {
-    stepNumber: 3,
-    title: 'Generational Idea Gaming & Gift Allocation Rules',
-    objective: 'Submit transformative solutions for world, national, and generational challenges while participating in educational gift games.',
-    prerequisites: [
-      'Participant account (free for all global and national citizens)',
-      'No financial purchase required to submit ideas'
-    ],
-    instructions: [
-      'Enter the Generational Idea & Gift Gaming Arena.',
-      'Select the "Impact Challenge Quiz" to test your knowledge on sustainable development, national economics, and international ethics.',
-      'Each correct challenge unlocks instant Zebene Impact Gift Badges and Tokens.',
-      'Submit your original generational idea (Clean Energy, Agriculture, Education, Healthcare).',
-      'Top-voted ideas receive digital gift grant allocations directly supported by our generational endowment.'
-    ],
-    complianceLaw: 'UN Sustainable Development Goals (SDG 8 & SDG 9) Civic Engagement Charter',
-    notes: 'Gift tokens serve as non-monetary recognition and project milestone rewards. Members do not earn platform equity or dividends.'
-  },
-  {
-    stepNumber: 4,
-    title: 'Product Trading, Escrow & International Settlement',
-    objective: 'Execute high-value cross-border purchases and sales of agricultural, energy, and industrial commodities with guaranteed escrow.',
-    prerequisites: [
-      'Pre-cleared Bank Liquidity Line or Deposited Escrow Balance',
-      'Phytosanitary or Technical Quality Certificate'
-    ],
-    instructions: [
-      'Browse the Commodity & Product Trading Exchange for listed verified goods.',
-      'Review quality benchmarks (e.g. SCA Grade 1 for coffee, Tier 1 for solar modules).',
-      'Click "Execute Trade Order" to open the smart escrow contract.',
-      'Select the settlement partner bank (e.g. CBE or Standard Chartered).',
-      'The buyer funds the neutral bank escrow pool; seller initiates multimodal shipping under specified Incoterms (FOB/CIF).',
-      'Upon port customs clearance and inspection sign-off, funds are released to the seller after automated tax and platform commission deductions.'
-    ],
-    complianceLaw: 'ICC Incoterms 2020 & AfCFTA Protocol on Trade in Goods',
-    notes: 'Platform automatically deducts the platform owner transaction commission (1.85%) and routes government taxes directly to state revenue accounts.'
-  },
-  {
-    stepNumber: 5,
-    title: 'Expense-to-Income Yield Mechanism Deployment',
-    objective: 'Convert operational transaction and logistics expenditures into residual institutional yield and cashflow offsets.',
-    prerequisites: [
-      'Recorded platform business expenditures (trade commissions, freight, storage, bank fees)'
-    ],
-    instructions: [
-      'Open the Expense-to-Income Engine tab.',
-      'Review your verified expenditure ledger across logistics, energy, and interbank transaction charges.',
-      'Activate the "Algorithmic Yield Reinvestment Vault".',
-      'The engine automatically routes an allocation of platform-held liquidity reserves to generate between 4.2% and 8.5% annual yield offsets.',
-      'View real-time expense offset credits applied directly against future administrative fees.'
-    ],
-    complianceLaw: 'International Capital Preservation & Treasury Management Norms',
-    notes: 'Yield generated from expenses acts as operational fee discounts and liquidity cushions, not speculative member profit dividends.'
-  },
-  {
-    stepNumber: 6,
-    title: 'Automated Government & Banking Tax Remittance',
-    objective: 'Ensure zero-leakage collection and instant direct filing of national VAT, corporate taxes, and bank stamp duties.',
-    prerequisites: [
-      'Valid Tax Identification Number (TIN) linked to trade profile'
-    ],
-    instructions: [
-      'Open the Tax & Government Portal to inspect real-time fiscal accruals.',
-      'For every completed trade order, the system applies the statutory VAT (15%), Customs Tariff, and Bank Stamp Duty (0.5%).',
-      'The platform generates an electronic filing number (e.g. ET-REV-VAT-XXXX).',
-      'Tax funds are transmitted via direct RTGS interbank clearing to the Federal Ministry of Finance and National Bank revenue accounts.',
-      'Download the official stamped Government Tax Clearance Certificate for corporate audit.'
-    ],
-    complianceLaw: 'National Commercial Tax Code & Interbank Revenue Remittance Directives',
-    notes: 'The platform charges an administrative processing spread to the owner, ensuring zero fiscal evasion and complete government compliance.'
-  },
-  {
-    stepNumber: 7,
-    title: 'Platform Economics & Owner Revenue Governance',
-    objective: 'Understand the sovereign institutional revenue model and member participation rights.',
-    prerequisites: [
-      'General terms agreement accepted upon initial registration'
-    ],
-    instructions: [
-      'Consult the Owner Revenue & Platform Economics section for full financial disclosure.',
-      'The Zebene International Multi-purpose Application is an institutional engine owned and governed by the Platform Founder / Sovereign Entity.',
-      'The owner earns platform revenues via: (a) 1.85% transaction fee on product trades, (b) 0.45% bank settlement routing fee, (c) enterprise access licenses, and (d) tax processing administration.',
-      'Members operate as utility participants with zero dividend distribution or equity ownership, protecting the platform from speculative member claims and maintaining stability.'
-    ],
-    complianceLaw: 'International Corporate Governance & Institutional Non-Dividend Utility Charter',
-    notes: 'This structural separation guarantees that the platform remains financially solvent, legally sound, and focused on national and global prosperity.'
-  }
-];
-
-export const INITIAL_PARTICIPANTS: ParticipantProfile[] = [
-  {
-    codeNumber: 'ZAIC-ET-8942-019',
+    id: 'MEM-001',
     fullName: 'Zebene Asfye',
-    organization: 'Zebene Asfye International Communication Directorate',
-    role: 'Platform Builder & Sovereign Director',
+    age: 42,
+    gender: 'Male',
     country: 'Ethiopia',
     thumbprintVerified: true,
-    thumbprintHash: 'THUMB-RH-SHA256:7A9F02C1E8B4',
-    eyeIrisVerified: true,
-    eyeIrisHash: 'IRIS-RE-SHA256:4B1C98E3D7A0',
-    registeredDate: '2026-09-29',
-    accessTier: 'Government & Sovereign',
-    status: 'Active'
+    thumbprintHash: 'THUMB-RH-SHA256:7B88A0194C3E',
+    eyeprintVerified: true,
+    eyeprintHash: 'IRIS-RE-SHA256:91CD22EA8801',
+    fourDigitCode: '1224', // Builder & Founder master code
+    registeredDate: '2026-09-18',
+    isGoldenChairMember: true,
+    balanceUSD: 245.50,
+    tasksCompleted: 14,
+    donationsGivenUSD: 120.00,
+    avatarUrl: '/images/director_zebene.jpg',
+    status: 'VIP Golden Member'
   },
   {
-    codeNumber: 'ZAIC-ET-3120-441',
-    fullName: 'Kaleb Tadesse',
-    organization: 'Oromia Coffee Farmers Union Cooperative',
-    role: 'Senior Trade Exporter',
+    id: 'MEM-002',
+    fullName: 'Selamawit Tadesse',
+    age: 29,
+    gender: 'Female',
     country: 'Ethiopia',
     thumbprintVerified: true,
-    thumbprintHash: 'THUMB-RH-SHA256:88BC19A034EF',
-    eyeIrisVerified: true,
-    eyeIrisHash: 'IRIS-RE-SHA256:6632DDA90123',
+    thumbprintHash: 'THUMB-RH-SHA256:4421990ABCC1',
+    eyeprintVerified: true,
+    eyeprintHash: 'IRIS-RE-SHA256:88991122DDAA',
+    fourDigitCode: '4821',
     registeredDate: '2026-09-22',
-    accessTier: 'Verified Trade Partners',
-    status: 'Active'
+    isGoldenChairMember: true,
+    balanceUSD: 85.00,
+    tasksCompleted: 6,
+    donationsGivenUSD: 35.00,
+    avatarUrl: '/images/director_zebene.jpg',
+    status: 'VIP Golden Member'
   },
   {
-    codeNumber: 'ZAIC-KE-7712-902',
-    fullName: 'Dr. Amina Nour',
-    organization: 'Rift Clean Energy & AgTech Labs',
-    role: 'Renewable Technology Commissioner',
+    id: 'MEM-003',
+    fullName: 'Kiprono Koech',
+    age: 34,
+    gender: 'Male',
     country: 'Kenya',
     thumbprintVerified: true,
-    thumbprintHash: 'THUMB-RH-SHA256:A1409F338902',
-    eyeIrisVerified: true,
-    eyeIrisHash: 'IRIS-RE-SHA256:F9027811BC44',
-    registeredDate: '2026-09-25',
-    accessTier: 'Verified Trade Partners',
+    thumbprintHash: 'THUMB-RH-SHA256:55018322CA09',
+    eyeprintVerified: true,
+    eyeprintHash: 'IRIS-RE-SHA256:1194200AA556',
+    fourDigitCode: '7390',
+    registeredDate: '2026-09-24',
+    isGoldenChairMember: false,
+    balanceUSD: 42.50,
+    tasksCompleted: 4,
+    donationsGivenUSD: 25.00,
+    avatarUrl: '/images/director_zebene.jpg',
     status: 'Active'
   },
   {
-    codeNumber: 'ZAIC-ET-5509-318',
-    fullName: 'Yohannes Bekele',
-    organization: 'Commercial Bank of Ethiopia (CBE)',
-    role: 'Senior Settlement Officer & SWIFT Trustee',
-    country: 'Ethiopia',
-    thumbprintVerified: true,
-    thumbprintHash: 'THUMB-RH-SHA256:22019944ABCC',
-    eyeIrisVerified: true,
-    eyeIrisHash: 'IRIS-RE-SHA256:1194200AA556',
-    registeredDate: '2026-09-26',
-    accessTier: 'Commercial Banks Only',
-    status: 'Active'
-  },
-  {
-    codeNumber: 'ZAIC-BE-1094-825',
-    fullName: 'Sarah Van Der Bilt',
-    organization: 'Antwerp Global Commodities NV',
-    role: 'European Importer Managing Partner',
-    country: 'Belgium',
-    thumbprintVerified: true,
-    thumbprintHash: 'THUMB-RH-SHA256:DD910243E511',
-    eyeIrisVerified: true,
-    eyeIrisHash: 'IRIS-RE-SHA256:55018322CA09',
-    registeredDate: '2026-09-27',
-    accessTier: 'Verified Trade Partners',
-    status: 'Active'
-  },
-  {
-    codeNumber: 'ZAIC-US-6231-507',
-    fullName: 'Marcus Vance',
-    organization: 'Fedwire & International Clearing Node',
-    role: 'Central Clearinghouse Officer',
-    country: 'United States',
+    id: 'MEM-004',
+    fullName: 'Claire Dubois',
+    age: 31,
+    gender: 'Female',
+    country: 'France',
     thumbprintVerified: true,
     thumbprintHash: 'THUMB-RH-SHA256:99881122DDBB',
-    eyeIrisVerified: true,
-    eyeIrisHash: 'IRIS-RE-SHA256:77334411FFEE',
-    registeredDate: '2026-09-28',
-    accessTier: 'Commercial Banks Only',
+    eyeprintVerified: true,
+    eyeprintHash: 'IRIS-RE-SHA256:77334411FFEE',
+    fourDigitCode: '9152',
+    registeredDate: '2026-09-26',
+    isGoldenChairMember: false,
+    balanceUSD: 110.00,
+    tasksCompleted: 8,
+    donationsGivenUSD: 50.00,
+    avatarUrl: '/images/director_zebene.jpg',
     status: 'Active'
   }
 ];
+
+export const AID_DRIVES: HumanitarianAidDrive[] = [
+  {
+    id: 'AID-01',
+    title: 'Clean Drinking Water Tankers for Rural Boreholes',
+    cause: 'Drought Relief & Clean Water',
+    region: 'Eastern Lowlands & Somali Corridor',
+    targetUSD: 15000,
+    collectedUSD: 9420,
+    donorCount: 164,
+    connectedBank: 'Commercial Bank of Ethiopia (CBE)',
+    bankAccountNumber: '1000-2938-4819-20',
+    imageUrl: '/images/humanitarian_aid.jpg',
+    beneficiariesCount: 2800,
+    status: 'Active Collection',
+    recentDonations: [
+      {
+        donorName: 'Anonymous Diaspora Member',
+        donorCountry: 'United States',
+        amountUSD: 50,
+        amountETB: 7750,
+        date: '2026-09-29',
+        bankReference: 'CBE-AID-9821'
+      },
+      {
+        donorName: 'Zebene Asfye',
+        donorCountry: 'Ethiopia',
+        amountUSD: 100,
+        amountETB: 15500,
+        date: '2026-09-28',
+        bankReference: 'CBE-AID-9810'
+      },
+      {
+        donorName: 'Amina & Family',
+        donorCountry: 'Kenya',
+        amountUSD: 25,
+        amountETB: 3875,
+        date: '2026-09-27',
+        bankReference: 'TB-AID-7140'
+      }
+    ]
+  },
+  {
+    id: 'AID-02',
+    title: 'School Nutrition & Learning Books for Primary Children',
+    cause: 'School Nutrition & Books',
+    region: 'Oromia & Amhara Highland Communities',
+    targetUSD: 8000,
+    collectedUSD: 5310,
+    donorCount: 98,
+    connectedBank: 'Telebirr Humanitarian Escrow & Awash Bank',
+    bankAccountNumber: '0142-9901-8422-00',
+    imageUrl: '/images/humanitarian_aid.jpg',
+    beneficiariesCount: 1450,
+    status: 'Active Collection',
+    recentDonations: [
+      {
+        donorName: 'Addis Youth Volunteer Circle',
+        donorCountry: 'Ethiopia',
+        amountUSD: 40,
+        amountETB: 6200,
+        date: '2026-09-30',
+        bankReference: 'AWASH-AID-5510'
+      },
+      {
+        donorName: 'Marcus V.',
+        donorCountry: 'United Kingdom',
+        amountUSD: 75,
+        amountETB: 11625,
+        date: '2026-09-28',
+        bankReference: 'CBE-AID-9755'
+      }
+    ]
+  },
+  {
+    id: 'AID-03',
+    title: 'Emergency Mobile Clinic Kits & Essential Medicines',
+    cause: 'Emergency Medical Supplies',
+    region: 'Regional Health Clinics & Maternity Outposts',
+    targetUSD: 12000,
+    collectedUSD: 7850,
+    donorCount: 142,
+    connectedBank: 'Bank of Abyssinia & Commercial Bank of Ethiopia',
+    bankAccountNumber: 'BOA-2026-7788-11',
+    imageUrl: '/images/humanitarian_aid.jpg',
+    beneficiariesCount: 3200,
+    status: 'Active Collection',
+    recentDonations: [
+      {
+        donorName: 'Global Friends Relief',
+        donorCountry: 'Belgium',
+        amountUSD: 150,
+        amountETB: 23250,
+        date: '2026-09-29',
+        bankReference: 'BOA-AID-8802'
+      }
+    ]
+  }
+];
+
+export const WORKFORCE_TASKS: WorkforceTask[] = [
+  {
+    id: 'TSK-101',
+    title: 'Field Verification of Washed Arabica Coffee Parchment',
+    category: 'Agricultural Inspection',
+    rewardUSD: 35.00,
+    estimatedHours: 3.5,
+    difficulty: 'Intermediate',
+    employer: 'Sidama Coffee Growers Cooperative Union',
+    country: 'Ethiopia',
+    availablePositions: 8,
+    filledPositions: 5,
+    description: 'Physically or digitally verify moisture level and parchment integrity for 20 export bags using calibrated moisture probe checklist.',
+    skillsRequired: ['Quality Inspection', 'Mobile Photo Capture', 'Moisture Record']
+  },
+  {
+    id: 'TSK-102',
+    title: 'Agricultural Safety Manual Translation (English to Amharic/Oromo)',
+    category: 'Language Translation',
+    rewardUSD: 45.00,
+    estimatedHours: 4.0,
+    difficulty: 'Beginner',
+    employer: 'Green Valley Irrigation Initiative',
+    country: 'Ethiopia',
+    availablePositions: 5,
+    filledPositions: 3,
+    description: 'Translate a 4-page practical guide on solar drip irrigation maintenance into clear native regional language terms.',
+    skillsRequired: ['Bilingual Fluency', 'Agricultural Terminology']
+  },
+  {
+    id: 'TSK-103',
+    title: 'Digital Verification of Clean Energy Solar Kit Inverters',
+    category: 'Trade Verification',
+    rewardUSD: 60.00,
+    estimatedHours: 5.0,
+    difficulty: 'Specialist',
+    employer: 'East Africa Clean Electrification Consortium',
+    country: 'Kenya / Regional',
+    availablePositions: 4,
+    filledPositions: 2,
+    description: 'Conduct QR code validation, battery discharge test logging, and digital serial ledger signoff for 15 solar units.',
+    skillsRequired: ['Electrical Fundamentals', 'Serial Barcode Audit']
+  },
+  {
+    id: 'TSK-104',
+    title: 'Local Artisan Woven Textile & Craft Cataloging',
+    category: 'Digital Cataloging',
+    rewardUSD: 28.00,
+    estimatedHours: 2.5,
+    difficulty: 'Beginner',
+    employer: 'National Heritage Craft Export Desk',
+    country: 'Ethiopia',
+    availablePositions: 10,
+    filledPositions: 7,
+    description: 'Upload high-resolution photographs, measure dimensions, and document weaver details for handwoven cotton Gabi textiles.',
+    skillsRequired: ['Photography', 'Accurate Measurement']
+  }
+];
+
+export const TRADE_COMMODITIES: TradeCommodity[] = [
+  {
+    id: 'COM-01',
+    name: 'Washed Arabica Coffee (Specialty Grade 1 Yirgacheffe)',
+    category: 'Agricultural Product',
+    priceUSD: 480.00,
+    unit: '60kg Jute Bag',
+    stockAvailable: 240,
+    originCountry: 'Ethiopia',
+    qualityCertificate: 'ECX Certified Specialty / Q-Grade 88.5',
+    imageUrl: '/images/specialty_coffee.jpg',
+    minimumOrder: 2,
+    description: 'Fair-trade export washed coffee beans featuring fragrant jasmine aroma, sweet bergamot notes, and single-origin traceable cooperatives.'
+  },
+  {
+    id: 'COM-02',
+    name: 'Standalone Solar Home Electrification Kit (120W Inverter + 3 Lamps)',
+    category: 'Clean Energy',
+    priceUSD: 185.00,
+    unit: 'Complete Household Unit',
+    stockAvailable: 150,
+    originCountry: 'Certified Assembly Hub',
+    qualityCertificate: 'ISO 9001 / IEC Clean Energy Certified',
+    imageUrl: '/images/golden_chair_studio.jpg',
+    minimumOrder: 1,
+    description: 'Durable lithium iron phosphate battery unit equipped with USB multi-device charging ports and 12-hour high-lumen LED lamps.'
+  },
+  {
+    id: 'COM-03',
+    name: 'Pure White Humera Sesame Seeds (Machine Cleaned)',
+    category: 'Agricultural Product',
+    priceUSD: 980.00,
+    unit: '500kg Half-Metric Lot',
+    stockAvailable: 85,
+    originCountry: 'Ethiopia',
+    qualityCertificate: 'Purity 99.8% / Phytosanitary Cleared',
+    imageUrl: '/images/specialty_coffee.jpg',
+    minimumOrder: 1,
+    description: 'Export-grade white sesame seeds renowned worldwide for culinary tahini and cold-pressed organic seed oils.'
+  },
+  {
+    id: 'COM-04',
+    name: 'Handcrafted Full-Grain Ethiopian Leather Portfolio Bag',
+    category: 'Artisan Craft',
+    priceUSD: 75.00,
+    unit: 'Handmade Item',
+    stockAvailable: 120,
+    originCountry: 'Ethiopia',
+    qualityCertificate: 'Ethical Tannery Council Approved',
+    imageUrl: '/images/golden_chair_studio.jpg',
+    minimumOrder: 1,
+    description: 'Supple vegetable-tanned leather briefcase hand-stitched by certified Addis craftswomen, supporting fair artisan livelihoods.'
+  }
+];
+
+export const INITIAL_TRANSACTIONS: TradeTransaction[] = [
+  {
+    id: 'TXN-2026-4401',
+    commodityName: 'Washed Arabica Coffee (Grade 1 Yirgacheffe)',
+    buyerName: 'Claire Dubois (France)',
+    sellerName: 'Oromia Farmers Union (Ethiopia)',
+    quantity: 2,
+    unit: '60kg Jute Bag',
+    subtotalUSD: 960.00,
+    vatTax15USD: 144.00, // 15% VAT
+    platformFeeUSD: 17.76, // 1.85% realistic fee
+    totalPaidUSD: 1121.76,
+    bankRail: 'Commercial Bank of Ethiopia (CBE Birr Escrow)',
+    date: '2026-09-28',
+    status: 'Delivered & Released'
+  },
+  {
+    id: 'TXN-2026-4402',
+    commodityName: 'Standalone Solar Home Electrification Kit (120W)',
+    buyerName: 'Kiprono Koech (Kenya)',
+    sellerName: 'Addis Clean Energy Distribution',
+    quantity: 1,
+    unit: 'Complete Household Unit',
+    subtotalUSD: 185.00,
+    vatTax15USD: 27.75, // 15% VAT
+    platformFeeUSD: 3.42,
+    totalPaidUSD: 216.17,
+    bankRail: 'Telebirr SuperApp Instant Settlement',
+    date: '2026-09-29',
+    status: 'Escrow Locked'
+  },
+  {
+    id: 'TXN-2026-4403',
+    commodityName: 'Handcrafted Full-Grain Leather Portfolio Bag',
+    buyerName: 'Sarah V. (Belgium)',
+    sellerName: 'Entoto Artisan Cooperative',
+    quantity: 2,
+    unit: 'Handmade Item',
+    subtotalUSD: 150.00,
+    vatTax15USD: 22.50,
+    platformFeeUSD: 2.78,
+    totalPaidUSD: 175.28,
+    bankRail: 'Chapa Gateway / Visa Card',
+    date: '2026-09-30',
+    status: 'Escrow Locked'
+  }
+];
+
+export const INITIAL_CHAT_MESSAGES: LiveChatMessage[] = [
+  {
+    id: 'chat-1',
+    senderName: 'Director Zebene Asfye',
+    senderCountry: 'Ethiopia',
+    senderFourDigit: '1224',
+    isGoldenChair: true,
+    text: 'Welcome all international delegates. Please take your seat at the Golden Chair studio. We are broadcasting live trade clearances and aid allocations.',
+    time: '14:15',
+    originalLanguage: 'en'
+  },
+  {
+    id: 'chat-2',
+    senderName: 'Selamawit T.',
+    senderCountry: 'Ethiopia',
+    senderFourDigit: '4821',
+    isGoldenChair: true,
+    text: 'Good afternoon. I have completed the agricultural moisture task for the Yirgacheffe harvest. The report is verified on the ledger.',
+    time: '14:18',
+    originalLanguage: 'am'
+  },
+  {
+    id: 'chat-3',
+    senderName: 'Kiprono Koech',
+    senderCountry: 'Kenya',
+    senderFourDigit: '7390',
+    isGoldenChair: false,
+    text: 'Solar home kit received in Nairobi. Working flawlessly. I have also contributed $25 to the Clean Water Boreholes drive.',
+    time: '14:20',
+    originalLanguage: 'sw'
+  },
+  {
+    id: 'chat-4',
+    senderName: 'Claire Dubois',
+    senderCountry: 'France',
+    senderFourDigit: '9152',
+    isGoldenChair: false,
+    text: 'Bonjour à tous! The translation feature works seamlessly. Excellent transparency on the 15% VAT filing.',
+    time: '14:22',
+    originalLanguage: 'fr'
+  }
+];
+
+export const COUNTRY_DEMOGRAPHICS: CountryStatistic[] = [
+  { country: 'Ethiopia', flag: '🇪🇹', memberCount: 1420, percentage: 38 },
+  { country: 'Kenya', flag: '🇰🇪', memberCount: 540, percentage: 14 },
+  { country: 'United States', flag: '🇺🇸', memberCount: 410, percentage: 11 },
+  { country: 'Belgium & EU', flag: '🇪🇺', memberCount: 320, percentage: 9 },
+  { country: 'United Arab Emirates', flag: '🇦🇪', memberCount: 290, percentage: 8 },
+  { country: 'China', flag: '🇨🇳', memberCount: 260, percentage: 7 },
+  { country: 'United Kingdom', flag: '🇬🇧', memberCount: 210, percentage: 6 },
+  { country: 'Other Nations (28 Countries)', flag: '🌐', memberCount: 280, percentage: 7 }
+];
+
+export const WORLD_THRONES: ThroneDefinition[] = [
+  {
+    id: 'ideas-peace',
+    name: 'The Throne of Visionary Ideas & World Peace',
+    amharicTitle: 'የሰላምና የታላላቅ ሃሳቦች ሉዓላዊ ዙፋን',
+    subtitle: 'Elevating Human Mindset, Ethical Consciousness & Global Harmony',
+    description: 'Conferred upon profound thinkers, peacemakers, philosophers, and reformers whose transcendent ideas resolve hostility, dismantle prejudice, and align humanity toward collective dignity and moral ascension.',
+    accentColor: 'from-amber-400 via-amber-500 to-amber-600',
+    badgeTheme: 'border-amber-500/40 bg-amber-500/10 text-amber-300',
+    mandate: 'To instill a universal mindset of reconciliation, shared prosperity, and respectful coexistence across all sovereign territories.',
+    currentLaureateId: 'LAUR-001',
+    totalLaureatesBestowed: 12,
+    totalEndowmentUSD: 120000
+  },
+  {
+    id: 'tech-knowledge',
+    name: 'The Throne of Technological Knowledge & Advancement',
+    amharicTitle: 'የቴክኖሎጂ እና የሳይንሳዊ ዕውቀት ሉዓላዊ ዙፋን',
+    subtitle: 'Empowering Humanity with Sustainable Science, Clean Compute & Digital Equity',
+    description: 'Reserved for transcendent engineers, inventors, scientific visionaries, and technologists whose breakthroughs conquer scarcity, accelerate sustainable energy, and democratize knowledge without exploitation.',
+    accentColor: 'from-cyan-400 via-teal-500 to-emerald-600',
+    badgeTheme: 'border-cyan-500/40 bg-cyan-500/10 text-cyan-300',
+    mandate: 'To direct supreme scientific intellect toward the flourishing of life, ethical artificial intelligence, clean environmental technology, and global progress.',
+    currentLaureateId: 'LAUR-002',
+    totalLaureatesBestowed: 9,
+    totalEndowmentUSD: 95000
+  },
+  {
+    id: 'charitable-deeds',
+    name: 'The Throne of Charitable Deeds & Universal Aid',
+    amharicTitle: 'የበጎ አድራጎት እና የርኅራኄ ሉዓላዊ ዙፋን',
+    subtitle: 'Healing Suffering, Championing the Vulnerable & Selfless Philanthropy',
+    description: 'Dedicated to heroic humanitarians, healthcare pioneers, grassroots altruists, and philanthropists whose selfless devotion feeds the impoverished, shelters disaster victims, and leaves an indelible legacy of kindness.',
+    accentColor: 'from-rose-400 via-rose-500 to-amber-500',
+    badgeTheme: 'border-rose-500/40 bg-rose-500/10 text-rose-300',
+    mandate: 'To sanctify pure altruism, connect direct bank relief to those in critical need, and reward those who give without desire for self-aggrandizement.',
+    currentLaureateId: 'LAUR-003',
+    totalLaureatesBestowed: 16,
+    totalEndowmentUSD: 165000
+  }
+];
+
+export const WORLD_AWARDS: WorldAward[] = [
+  {
+    id: 'AWD-001',
+    name: 'Grand Sovereign Collar of Global Peace & Mindset',
+    throneCategory: 'ideas-peace',
+    honoraryTitle: 'Sovereign Laureate of World Peace',
+    grantAmountUSD: 25000,
+    grantAmountETB: 3875000,
+    medalDesign: '24K Gold Sunburst with Interlinked Olive Branches & Platinum Inlay',
+    decreeSummary: 'Conferred by the High Council of International Communication for dismantling international polarization and fostering enlightenment.'
+  },
+  {
+    id: 'AWD-002',
+    name: 'Crystalline Prism of Technological Wisdom',
+    throneCategory: 'tech-knowledge',
+    honoraryTitle: 'Master Laureate of Scientific Advancement',
+    grantAmountUSD: 20000,
+    grantAmountETB: 3100000,
+    medalDesign: 'Laser-Cut Optical Quartz with Micro-Engraved Mathematical Axioms',
+    decreeSummary: 'Conferred for breakthrough open scientific knowledge that empowers low-income agrarian regions and cleans the biosphere.'
+  },
+  {
+    id: 'AWD-003',
+    name: 'Golden Laurels of Universal Compassion & Philanthropy',
+    throneCategory: 'charitable-deeds',
+    honoraryTitle: 'Protector Laureate of Humanity',
+    grantAmountUSD: 22500,
+    grantAmountETB: 3487500,
+    medalDesign: 'Solid Bronze Heart encircled by Gold Laurels & Certified Bank Seal',
+    decreeSummary: 'Conferred for sustained, transparent grassroots charity and emergency humanitarian life-saving interventions.'
+  },
+  {
+    id: 'AWD-004',
+    name: 'Medal of Civic Innovation & Social Harmony',
+    throneCategory: 'ideas-peace',
+    honoraryTitle: 'Distinguished Envoy of Cultural Coexistence',
+    grantAmountUSD: 15000,
+    grantAmountETB: 2325000,
+    medalDesign: 'Silver Medallion with Universal Dove and 7-Language Inscription',
+    decreeSummary: 'Recognizing community leaders who bridge ethnic and national divisions with sustainable dialogue.'
+  }
+];
+
+export const INITIAL_LAUREATES: LaureateNominee[] = [
+  {
+    id: 'LAUR-001',
+    name: 'Director General Zebene Asfye',
+    title: 'Founder & Architect of Sovereign International Communication',
+    country: 'Ethiopia',
+    countryFlag: '🇪🇹',
+    throneCategory: 'ideas-peace',
+    avatarUrl: '/images/director_zebene.jpg',
+    biography: 'Pioneer of the 7-language direct translation matrix, biometric thumbprint/iris validation, and the Sovereign Golden Chair Chamber. Dedicated to connecting all nations without intermediate exploitation.',
+    keyContribution: 'Conceptualized and built the sovereign international platform uniting global information exchange, bank-verified aid, fair commodity trade, and automated 15% tax compliance.',
+    impactMetrics: [
+      { metric: 'Nations Connected', value: '35 Sovereign States' },
+      { metric: 'Verified Members', value: '4,800+ Biometrically Cleared' },
+      { metric: 'Peace Declarations', value: '14 Multilateral Accords' }
+    ],
+    endorsementsCount: 2480,
+    status: 'Seated on Throne',
+    conferredAward: 'Grand Sovereign Collar of Global Peace & Mindset',
+    grantAmountUSD: 25000,
+    grantAmountETB: 3875000,
+    awardDate: '2026-09-24',
+    fourDigitCode: '1224',
+    biometricHash: 'THUMB-RH-SHA256:7B88A0194C3E',
+    worldAddressSpeech: 'Peace is not the mere absence of conflict, but the conscious creation of structures where every person has dignity, honest work, verified identity, and direct access to brotherhood across borders.',
+    nominatedBy: 'East African Peace & Regional Trade Council'
+  },
+  {
+    id: 'LAUR-002',
+    name: 'Dr. Amina Nour',
+    title: 'Chief Engineer, Pan-African Solar Hydro & Decentralized Microgrid',
+    country: 'Kenya',
+    countryFlag: '🇰🇪',
+    throneCategory: 'tech-knowledge',
+    avatarUrl: '/images/director_zebene_1790803334314.jpg',
+    biography: 'Renowned energy scientist and computational engineer. Developer of low-cost IoT irrigation grids and solar desalinators deployed across arid pastoralist corridors in the Great Rift Valley.',
+    keyContribution: 'Engineered an open-source solar microgrid algorithm that provides 24/7 continuous clean power to 120 community healthcare clinics and 45 agricultural trade hubs.',
+    impactMetrics: [
+      { metric: 'Clean Megawatts Generated', value: '18.4 MW Zero-Emission' },
+      { metric: 'Rural Clinics Powered', value: '120 Healthcare Units' },
+      { metric: 'Water Purified Daily', value: '850,000 Liters' }
+    ],
+    endorsementsCount: 1910,
+    status: 'Seated on Throne',
+    conferredAward: 'Crystalline Prism of Technological Wisdom',
+    grantAmountUSD: 20000,
+    grantAmountETB: 3100000,
+    awardDate: '2026-09-21',
+    fourDigitCode: '4920',
+    biometricHash: 'IRIS-RE-SHA256:A112C789B990',
+    worldAddressSpeech: 'Technology reaches its highest moral calling when a solar cell pumps pure drinking water for a child who previously walked ten miles. Science must belong to humanity.',
+    nominatedBy: 'Pan-African Scientific & Industrial Academy'
+  },
+  {
+    id: 'LAUR-003',
+    name: 'Dr. Tefera Mekonnen',
+    title: 'Founder, Horn of Africa Emergency Surgical & Nutrition Vanguard',
+    country: 'Ethiopia',
+    countryFlag: '🇪🇹',
+    throneCategory: 'charitable-deeds',
+    avatarUrl: '/images/humanitarian_aid.jpg',
+    biography: 'Heroic emergency surgeon and public health champion. Personally performed over 3,400 life-saving surgical operations in drought-stricken regions and oversaw the distribution of clean nutrition to 25,000 children.',
+    keyContribution: 'Established mobile hospital convoys that travel to remote nomadic settlements, providing free emergency operations and distributing verified medical supplies linked with local bank escrow.',
+    impactMetrics: [
+      { metric: 'Free Surgeries Performed', value: '3,420 Procedures' },
+      { metric: 'Children Nourished', value: '25,000+ Infants' },
+      { metric: 'Emergency Convoys', value: '18 Mobile Units' }
+    ],
+    endorsementsCount: 3150,
+    status: 'Seated on Throne',
+    conferredAward: 'Golden Laurels of Universal Compassion & Philanthropy',
+    grantAmountUSD: 22500,
+    grantAmountETB: 3487500,
+    awardDate: '2026-09-15',
+    fourDigitCode: '7741',
+    biometricHash: 'THUMB-RH-SHA256:0998B12E5F20',
+    worldAddressSpeech: 'When you relieve the pain of a fellow human being, you heal the world. Charity is not a transaction; it is our sacred duty to one another.',
+    nominatedBy: 'Global Humanitarian Medical Federation'
+  },
+  {
+    id: 'LAUR-004',
+    name: 'Hiroshi Tanaka',
+    title: 'Lead Architect of Regenerative Agronomy & Climate Resilience',
+    country: 'Japan',
+    countryFlag: '🇯🇵',
+    throneCategory: 'tech-knowledge',
+    avatarUrl: '/images/specialty_coffee.jpg',
+    biography: 'Environmental data scientist who pioneered biological soil restoration sensors and pest forecasting systems, shared royalty-free with smallholder farmers across developing economies.',
+    keyContribution: 'Developed satellite-assisted soil microbiome restoration chips that cut synthetic fertilizer costs by 60% while doubling organic crop yields.',
+    impactMetrics: [
+      { metric: 'Farmer Cooperatives Supported', value: '320 Farming Guilds' },
+      { metric: 'Crop Yield Increase', value: '+42% Organic Output' },
+      { metric: 'Chemical Runoff Reduced', value: '-65% Fertilizer Waste' }
+    ],
+    endorsementsCount: 1420,
+    status: 'Distinguished Nominee',
+    conferredAward: 'Pending Council Acclamation',
+    grantAmountUSD: 15000,
+    grantAmountETB: 2325000,
+    awardDate: '2026-10-01',
+    fourDigitCode: '8832',
+    biometricHash: 'IRIS-RE-SHA256:3992C810E234',
+    worldAddressSpeech: 'The soil is our collective memory and our future bread. Marrying computational science with natural stewardship ensures peace for the generations yet unborn.',
+    nominatedBy: 'Kyoto Institute for Sustainable Earth Sciences'
+  },
+  {
+    id: 'LAUR-005',
+    name: 'Elena Rostova',
+    title: 'International Peace Treaty Mediator & Civic Restorative Justice Director',
+    country: 'Switzerland',
+    countryFlag: '🇨🇭',
+    throneCategory: 'ideas-peace',
+    avatarUrl: '/images/golden_chair_studio.jpg',
+    biography: 'Diplomatic veteran of over 20 peace negotiations. Specializes in designing cross-border economic treaties that eliminate the financial motives for armed territorial aggression.',
+    keyContribution: 'Drafted the "Equitable Water & Mineral Treaty Framework" utilized to de-escalate cross-border resource tensions in three transboundary river basins.',
+    impactMetrics: [
+      { metric: 'Treaties Facilitated', value: '7 Formal Accords' },
+      { metric: 'Communities Reconciled', value: '450,000 Residents' },
+      { metric: 'Civilian Observers Trained', value: '1,200 Peace Monitors' }
+    ],
+    endorsementsCount: 1680,
+    status: 'Distinguished Nominee',
+    conferredAward: 'Pending Council Acclamation',
+    grantAmountUSD: 20000,
+    grantAmountETB: 3100000,
+    awardDate: '2026-10-05',
+    fourDigitCode: '6145',
+    biometricHash: 'THUMB-RH-SHA256:5541A709E381',
+    worldAddressSpeech: 'Real diplomacy begins when we listen to the fears of the person on the opposite side of the table and design a future where neither side loses their honor.',
+    nominatedBy: 'Geneva Academy for Restorative Peace'
+  },
+  {
+    id: 'LAUR-006',
+    name: 'Tariq Al-Mansoor',
+    title: 'Philanthropist & Desert Green Canopy Foundation Trustee',
+    country: 'United Arab Emirates',
+    countryFlag: '🇦🇪',
+    throneCategory: 'charitable-deeds',
+    avatarUrl: '/images/specialty_coffee_1790803344457.jpg',
+    biography: 'Passionate benefactor of famine relief and arid land reforestation. Donated over $4.2M to grassroots community grain silos and clean water solar boreholes.',
+    keyContribution: 'Funded and directed the construction of 85 deep-aquifer solar pumping stations providing permanent potable water to over 180,000 displaced drought survivors.',
+    impactMetrics: [
+      { metric: 'Solar Wells Built', value: '85 Solar Pumping Plants' },
+      { metric: 'Lives Benefited', value: '180,000+ Villagers' },
+      { metric: 'Food Reserves Stocked', value: '6,200 Metric Tons' }
+    ],
+    endorsementsCount: 1850,
+    status: 'Distinguished Nominee',
+    conferredAward: 'Pending Council Acclamation',
+    grantAmountUSD: 18000,
+    grantAmountETB: 2790000,
+    awardDate: '2026-10-08',
+    fourDigitCode: '3319',
+    biometricHash: 'IRIS-RE-SHA256:7781A902F113',
+    worldAddressSpeech: 'Wealth is a temporary trust granted to us. Its only true nobility is measured by the thirst it quenches and the suffering it lifts from human shoulders.',
+    nominatedBy: 'Gulf Humanitarian Relief Council'
+  }
+];
+
+export const ANNUAL_LOTTERY_PRIZES: LotteryPrize[] = [
+  {
+    id: 'PRIZE-HOUSE',
+    tier: 'house',
+    title: 'Smart Sovereign Villa Residence (Grand Prize #1)',
+    amharicTitle: 'ዘመናዊ የቪላ መኖሪያ ቤት (የዓመቱ ታላቅ ሽልማት)',
+    quantity: 1,
+    estimatedValueUSD: 180000,
+    estimatedValueETB: 27900000,
+    imageUrl: '/images/annual_lottery_prizes.jpg',
+    description: 'An architectural masterpiece 3-bedroom luxury modern villa with smart home automation, high-capacity solar battery storage, manicured garden terrace, and dedicated security gates. Freehold legal title deed transferred with 100% tax and stamp duties pre-cleared.',
+    specifications: [
+      '3 Master Suites with En-Suite Bathrooms',
+      '12kW Rooftop Solar Array + Tesla/BYD Energy Storage',
+      'High-Speed Optical Fiber Internet Pre-Installed',
+      'Private 2-Car Garage with EV Rapid Charger',
+      'Prime Capital City Location with Freehold Title Deed'
+    ],
+    taxStatus: '15% VAT & Title Transfer Tax 100% Covered by Sovereign Escrow'
+  },
+  {
+    id: 'PRIZE-CAR',
+    tier: 'car',
+    title: '2026 All-Electric Executive SUV (Grand Prize #2)',
+    amharicTitle: 'ዘመናዊ የኤሌክትሪክ መኪና (የዓመቱ ሁለተኛ ታላቅ ሽልማት)',
+    quantity: 1,
+    estimatedValueUSD: 48000,
+    estimatedValueETB: 7440000,
+    imageUrl: '/images/annual_lottery_prizes.jpg',
+    description: 'State-of-the-art zero-emission electric SUV featuring dual-motor all-wheel drive, 520 km range per charge, panoramic glass roof, intelligent autonomous driving assistance, and home fast-charging station installation included.',
+    specifications: [
+      'Dual Motor AWD with 520 km Driving Range',
+      'Zero Emissions & Ultra-Quiet Cabin Acoustic Glass',
+      '3-Year Full Manufacturer Warranty & Roadside Assist',
+      'Complimentary 22kW Home Wallbox Charger Included',
+      '1-Year Comprehensive Insurance & Registration Included'
+    ],
+    taxStatus: 'Customs Duties & Road Clearance Fully Paid'
+  },
+  {
+    id: 'PRIZE-PHONES',
+    tier: 'phones',
+    title: 'Flagship 5G Ultra Satellite Smartphones (25 Winners)',
+    amharicTitle: 'ዘመናዊ ስማርት ስልኮች (ለ 25 ዕድለኞች)',
+    quantity: 25,
+    estimatedValueUSD: 1200,
+    estimatedValueETB: 186000,
+    imageUrl: '/images/annual_lottery_prizes.jpg',
+    description: 'The pinnacle of mobile technology: 25 winners receive the titanium flagship smartphone featuring direct satellite emergency connectivity, 200MP pro-grade camera sensor, 1TB ultra-fast storage, and 12-month unlimited worldwide high-speed data eSIM.',
+    specifications: [
+      'Aerospace Titanium Frame & Ceramic Shield Glass',
+      '1TB Storage + 16GB High-Speed RAM',
+      'Direct Satellite SOS & Global Mesh Messaging',
+      '12 Months Free Worldwide High-Speed Data Plan',
+      'Wireless MagSafe Charger & Protective Case Bundle'
+    ],
+    taxStatus: 'Fully Cleared & Delivered to Winner Address'
+  },
+  {
+    id: 'PRIZE-SPECIAL',
+    tier: 'special',
+    title: 'Special Annual Empowerment Packages (175 Winners)',
+    amharicTitle: 'ልዩ የዓመቱ የማበረታቻ እና የኑሮ ማሻሻያ ጥቅሎች',
+    quantity: 175,
+    estimatedValueUSD: 850,
+    estimatedValueETB: 131750,
+    imageUrl: '/images/annual_lottery_prizes.jpg',
+    description: 'Special annual community empowerment packages distributed among 175 lucky members to boost productivity and livelihoods: 15 Creator Laptops, 50 Solar Home Generators, 10 Deep Well Agricultural Solar Water Pumps, and 100 Cash Grants of $500 USD.',
+    specifications: [
+      '15x Pro Laptops for Digital Remote Workforce',
+      '50x Solar Microgrid Kits (Lights, TV, USB Charging)',
+      '10x Agricultural Solar Pumping Stations for Farmers',
+      '100x Cash Grants of $500 USD (77,500 ETB) via Bank Transfer',
+      'Direct Bank Settlement to CBE or Telebirr Account'
+    ],
+    taxStatus: 'Direct Non-Taxable Community Empowerment Benefit'
+  }
+];
+
+export const INITIAL_USER_TICKETS: LotteryTicket[] = [
+  {
+    id: 'TCK-001',
+    ticketNumber: 'ZAIC-LOTTO-2026-8812',
+    memberId: 'MEM-001',
+    memberName: 'Zebene Asfye',
+    memberCountry: 'Ethiopia',
+    purchaseDate: '2026-09-22',
+    priceUSD: 10,
+    drawDate: '2026-12-31',
+    status: 'Active',
+    verificationHash: 'LOTTO-SHA256:88F201A94D12'
+  },
+  {
+    id: 'TCK-002',
+    ticketNumber: 'ZAIC-LOTTO-2026-4409',
+    memberId: 'MEM-001',
+    memberName: 'Zebene Asfye',
+    memberCountry: 'Ethiopia',
+    purchaseDate: '2026-09-25',
+    priceUSD: 10,
+    drawDate: '2026-12-31',
+    status: 'Active',
+    verificationHash: 'LOTTO-SHA256:44C890E1128B'
+  },
+  {
+    id: 'TCK-003',
+    ticketNumber: 'ZAIC-LOTTO-2026-1224',
+    memberId: 'MEM-001',
+    memberName: 'Zebene Asfye',
+    memberCountry: 'Ethiopia',
+    purchaseDate: '2026-09-28',
+    priceUSD: 10,
+    drawDate: '2026-12-31',
+    status: 'Active',
+    verificationHash: 'LOTTO-SHA256:1224FF0098A1'
+  }
+];
+
+export const PAST_LOTTERY_WINNERS: PastLotteryWinner[] = [
+  {
+    id: 'WIN-2025-01',
+    year: 2025,
+    winnerName: 'Yohannes Bekele',
+    winnerCountry: 'Ethiopia',
+    winnerCountryFlag: '🇪🇹',
+    ticketNumber: 'ZAIC-LOTTO-2025-3914',
+    prizeWon: 'Smart Sovereign Villa Residence (Grand Prize #1)',
+    prizeTier: 'house',
+    valueUSD: 175000,
+    valueETB: 27125000,
+    handoverDate: '2025-12-31',
+    photoUrl: '/images/director_zebene.jpg',
+    bankAuditRef: 'CBE-ESCROW-DEED-882194',
+    testimonial: 'Winning the annual house transformed our entire family life. The title deed was handed over at the Commercial Bank of Ethiopia headquarters with zero hidden fees. This platform is 100% honest and blessed.'
+  },
+  {
+    id: 'WIN-2025-02',
+    year: 2025,
+    winnerName: 'Faith Chebet',
+    winnerCountry: 'Kenya',
+    winnerCountryFlag: '🇰🇪',
+    ticketNumber: 'ZAIC-LOTTO-2025-7720',
+    prizeWon: '2025 All-Electric Executive SUV (Grand Prize #2)',
+    prizeTier: 'car',
+    valueUSD: 46000,
+    valueETB: 7130000,
+    handoverDate: '2025-12-31',
+    photoUrl: '/images/director_zebene_1790803334314.jpg',
+    bankAuditRef: 'KCB-INSPECTION-CERT-55912',
+    testimonial: 'I bought two tickets while completing translation workforce tasks. When my serial number was drawn live on the screen, I wept with joy. The electric car was delivered right to Nairobi.'
+  },
+  {
+    id: 'WIN-2025-03',
+    year: 2025,
+    winnerName: 'Tariq Al-Hassan',
+    winnerCountry: 'United Arab Emirates',
+    winnerCountryFlag: '🇦🇪',
+    ticketNumber: 'ZAIC-LOTTO-2025-1108',
+    prizeWon: 'Flagship 5G Ultra Titanium Smartphone',
+    prizeTier: 'phones',
+    valueUSD: 1200,
+    valueETB: 186000,
+    handoverDate: '2025-12-31',
+    photoUrl: '/images/specialty_coffee.jpg',
+    bankAuditRef: 'EMIRATES-NBD-COURIER-99120',
+    testimonial: 'The satellite smartphone arrived securely sealed via DHL courier with the 1-year data subscription pre-activated. Transparent and authentic lottery.'
+  }
+];
+
 

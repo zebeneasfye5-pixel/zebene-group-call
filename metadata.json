@@ -1,0 +1,6 @@
+{
+  "name": "Zebene International Multi-purpose Application",
+  "description": "Comprehensive enterprise platform integrating global information exchange, generational idea gaming, commodity trading, expense-to-income generation, bank connectivity, international financial and ethical law compliance, automated government tax remittances, and platform owner revenue governance.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
